@@ -1,4 +1,3 @@
-// set the dimensions and margins of the graph
 let documentId = new URLSearchParams(window.location.search).get('document_id')
 const httpRequest = new XMLHttpRequest()
 httpRequest.open('GET', `http://127.0.0.1:8000/documents/${documentId}`, true)
@@ -11,35 +10,17 @@ httpRequest.onreadystatechange = function () {
         }
     }
 }
-console.log(documentId)
 let nodes
 let edges
-let margin = document.querySelector('#margin').value
-let charge = document.querySelector('#charge').value
-let center = document.querySelector('#center').value
-let collision = document.querySelector('#collision').value
+let margin = 100
+let charge = -1200
+let centerX = document.querySelector('#dataviz_area').clientWidth / 2
+let centerY = document.querySelector('#dataviz_area').clientHeight / 2
+let collision = 40
 let simulation
+
 d3.json(`http://127.0.0.1:8000/documents/${documentId}/graph`, ForceGraph)
 
-const refresh = (e) => {
-    console.log(e.target.name, e.target.value)
-    const value = e.target.value
-    const name = e.target.name
-    if (name === 'margin') {
-        margin = value
-    } else if (name === 'charge') {
-        charge = value
-        simulation.force('charge', null).force('charge', d3.forceManyBody().strength(value))
-    } else if (name === 'center') {
-        simulation.force('center', d3.forceCenter(value, value))
-        center = value
-    } else if (name === 'collision') {
-        simulation.force('collision', d3.forceCollide().radius(value))
-        collision = value
-    }
-    console.log(simulation)
-    simulation.alpha(1)
-}
 const paramsInputs = document.querySelectorAll('.params__input')
 paramsInputs.forEach(input => {
     input.addEventListener('input', refresh)
@@ -59,31 +40,31 @@ function ticked() {
         .append("line")
         .style("stroke", "#aaa")
         .attr("x1", function (d) {
-            return d.source.x + margin;
+            return d.source.x
         })
         .attr("y1", function (d) {
-            return d.source.y + margin;
+            return d.source.y
         })
         .attr("x2", function (d) {
-            return d.target.x + margin;
+            return d.target.x
         })
         .attr("y2", function (d) {
-            return d.target.y + margin;
+            return d.target.y
         });
     d3.select('#dataviz_area').selectAll('circle').data(nodes).enter()
         .append('circle')
-        .attr('r', 8)
-        .style("fill", "#69b3a2")
-        .attr('cx', (d) => d.x + margin)
-        .attr('cy', (d) => d.y + margin)
+        .attr('r', 12)
+        .style("fill", "#7f8ca1")
+        .attr('cx', (d) => d.x)
+        .attr('cy', (d) => d.y)
 
     d3.select("#dataviz_area").selectAll('text').data(nodes).enter()
         .append('text')
         .attr("x", function (d) {
-            return d.x + margin;
+            return d.x
         })
         .attr("y", function (d) {
-            return d.y + margin;
+            return d.y
         })
         .text(function (d) {
             return d.name
@@ -96,7 +77,7 @@ function ticked() {
 function initSimulation() {
     simulation = d3.forceSimulation(nodes)
         .force('charge', d3.forceManyBody().strength(charge))
-        .force('center', d3.forceCenter(center, center))
+        .force('center', d3.forceCenter(centerX, centerY))
         .force("link", d3.forceLink()                               // This force provides links between nodes
             .id(function (d) {
                 return d.id;
@@ -104,6 +85,7 @@ function initSimulation() {
             .links(edges)                                    // and this the list of links
         )
         .force('collision', d3.forceCollide().radius(collision))
+        .alphaDecay(0.001)
         .on('tick', ticked)
 
 }

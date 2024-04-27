@@ -11,17 +11,15 @@
         left: 0;
         bottom: 0;
     }
+    #dataviz_area {
+        width: 100%;
+        height: 1000px;
+    }
 </style>
 <!-- Create a div where the graph will take place -->
 <div id="text"></div>
 <div id="my_dataviz"></div>
-<svg id="dataviz_area" height=2400 width=1600></svg>
-<div class="params">
-    <input class="params__input" value="800" type="number" name="margin" id="margin" min="-10000" max="10000">
-    <input class="params__input" value="-1000" type="number" name="charge" id="charge" min="-10000" max="10000">
-    <input class="params__input" value="400" type="number" name="center" id="center" min="-10000" max="10000">
-    <input class="params__input" value="160" type="number" name="collision" id="collision" min="-10000" max="10000">
-</div>
+<svg id="dataviz_area" ></svg>
 <script src="script.js">
 
 
